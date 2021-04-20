@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h3>发送消息</h3>
+    <input type="text" id="msg"/>
+    <input type="button" value="发送消息" id="sendMsg"/>
+    <h3>接收消息</h3>
+    <div id="receiveMsg" style="background-color: lightblue;">
+
+    </div>
+    <script type="application/javascript">
+        window.CHAT = {
+            socket: null,
+            init: function(){
+                //判断当前浏览器是否支持
+                if (window.WebSocket) {
+                    //实例化webSocket
+                    window.CHAT.socket = new WebSocket("ws://127.0.0.1:9999/ws");
+                    //设置websocket的各个生命周期方法
+                    window.CHAT.socket.onopen = function () {
+                        console.log("建立连接");
+                    },
+                        window.CHAT.socket.onclose = function () {
+                            console.log("连接关闭");
+                        },
+                        window.CHAT.socket.onerror = function () {
+                            console.log("发生错误");
+                        },
+                        window.CHAT.socket.onmessage = function (e) {
+                            console.log("接收到消息：" + e.data);
+                            var receiveMsg = document.getElementById("receiveMsg");
+                            var html = receiveMsg.innerHTML;
+                            receiveMsg.innerHTML = html + "<br/>" + e.data;
+                        };
+                } else {
+                    alert("当前浏览器不支持webSocket，请升级！");
+                }
+            },
+            chat: function () {
+                var msg = document.getElementById("msg");
+                window.CHAT.socket.send(msg.value);
+            }
+        }
+        window.CHAT.init();
+
+        var sendMsg = document.getElementById("sendMsg");
+        sendMsg.onclick = function(){
+            window.CHAT.chat();
+        }
+    </script>
+</body>
+</html>
